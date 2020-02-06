@@ -1,0 +1,264 @@
+package games.haxBall;
+
+import app.AppGame;
+import app.AppInput;
+import app.AppLoader;
+import org.newdawn.slick.*;
+import org.newdawn.slick.geom.Circle;
+import org.newdawn.slick.state.StateBasedGame;
+
+public class Player {
+	private float m_posX, m_posY, m_radius, m_fieldHeight, m_fieldWidth, m_fieldOriginX, m_fieldOriginY;
+	private Color m_actualColor, m_defaultColor;
+	private float m_speedX, m_speedY, m_speed;
+	private Field field;
+	private Circle m_shape;
+	private boolean shooting;
+	private float spawnX, spawnY;
+	private int team;
+	private String name;
+	private int shootButton;
+	private int xAxis, yAxis;
+	private Image club_logo;
+
+	public Player(String name, Field field, int team) {
+
+		this.field = field;
+		this.name = name;
+		this.shooting = false;
+		this.team = team;
+
+		m_fieldHeight = field.getHeight();
+		m_fieldWidth = field.getWidth();
+		m_fieldOriginX = field.getPosX();
+		m_fieldOriginY = field.getPosY();
+
+		m_radius = m_fieldHeight/25;
+		spawnY = (m_fieldHeight/2) + m_fieldOriginY - (m_radius/2);
+		m_speed = .3f;
+
+		if(team == 0) {
+
+			spawnX = ((m_fieldWidth)/6) + m_fieldOriginX;
+
+			m_defaultColor = new Color(0, 0, 255);
+
+			shootButton = AppInput.DPAD_DOWN;
+			xAxis = AppInput.AXIS_XL;
+			yAxis = AppInput.AXIS_YL;
+
+			this.club_logo = AppLoader.loadPicture("/images/icon.png");
+		}
+		else {
+			spawnX = ((3*m_fieldWidth)/4) + m_fieldOriginX;
+			m_defaultColor = new Color(255, 0, 0);
+
+			shootButton = AppInput.BUTTON_A;
+			xAxis = AppInput.AXIS_XR;
+			yAxis = AppInput.AXIS_YR;
+
+			this.club_logo = AppLoader.loadPicture("/images/haxBall/tektn.png");
+		}
+
+		m_posX = spawnX;
+		m_posY = spawnY;
+		m_actualColor = m_defaultColor;
+		m_shape = new Circle(m_posX+(m_radius/2), m_posY+(m_radius/2), m_radius/2);
+	}
+
+	public Player(int x, int y, Field field) {
+		this.field = field;
+		name = "";
+
+		m_fieldHeight = field.getHeight();
+		m_fieldWidth = field.getWidth();
+		m_fieldOriginX = field.getPosX();
+		m_fieldOriginY = field.getPosY();
+
+		this.shooting = false;
+		this.spawnX = x;
+		this.spawnY = y;
+		this.m_posX = spawnX;
+		this.m_posY = spawnY;
+		this.m_radius = m_fieldHeight/18;
+		this.m_defaultColor = new Color(70,70,70);
+		this.m_actualColor = m_defaultColor;
+		this.m_speed = 0;
+		this.team = 2;
+		this.m_shape = new Circle(m_posX+m_radius, m_posY+m_radius, m_radius);
+	}
+
+	/*public Player(int fieldHeight, int fieldWidth, int fieldOriginX, int fieldOriginY, int id, Player enemy) {
+		new Player(fieldHeight, fieldWidth, fieldOriginX, fieldOriginY, id);
+		m_enemy = enemy;
+	}*/
+
+	public void render (GameContainer container, StateBasedGame game, Graphics context) {
+		context.setColor(m_actualColor);
+		context.fillOval(m_posX, m_posY, m_radius * 2, m_radius * 2);
+		if(team < 2) {
+			context.setColor(new Color(64, 64, 64));
+			context.fillOval(m_posX + 4, m_posY + 4, m_radius * 2 - 8, m_radius * 2 - 8);
+			context.drawImage(club_logo, m_posX + 4, m_posY + 4, m_posX + m_radius * 2 - 4, m_posY + m_radius * 2 - 4, 0, 0, club_logo.getWidth(), club_logo.getHeight());
+			context.setColor(Color.black);
+		}
+
+//		context.setColor(new Color(0,255,0));
+//		context.draw(m_shape);
+	}
+
+	public void update (GameContainer container, StateBasedGame game, int delta) {
+		AppInput input = (AppInput) container.getInput();
+		move(delta, input);
+		shooting = input.isButtonPressed(shootButton);
+		updateShape();
+	}
+
+	public boolean collision(Player enemy) {
+		updateShape();
+		return m_shape.intersects(enemy.getShape());
+	}
+
+	private void updateShape() {
+		m_shape.setLocation(m_posX, m_posY);
+		m_shape.setRadius(m_radius);
+	}
+
+	public void move(int dt, AppInput input) {
+		m_speedX = input.getAxisValue(xAxis)*m_speed;
+		m_speedY = input.getAxisValue(yAxis)*m_speed;
+
+		m_posX += dt*m_speedX;
+		m_posY += dt*m_speedY;
+
+		for(Player p : field.getPlayers()) {
+			if(!p.equals(this) && collision(p)) {
+				double powX = (getCenterX() - p.getCenterX()) * (getCenterX() - p.getCenterX());
+				double powY = (getCenterY() - p.getCenterY()) * (getCenterY() - p.getCenterY());
+				double dist = Math.sqrt(powX + powY);
+				if(dist < m_radius + p.m_radius) {
+					if(p.team < 2) {
+						p.m_posX += dt * m_speedX * 0.5;
+						p.m_posY += dt * m_speedY * 0.5;
+					}
+					placeNextToPlayer(p);
+
+				}
+			}
+		}
+
+		if(m_posY <= m_fieldOriginY-m_radius*2) {
+			m_posY = m_fieldOriginY-m_radius*2;
+			m_speedY = 0;
+
+		} else if((m_posY) > (m_fieldOriginY + m_fieldHeight+m_radius)) {
+			m_posY = m_fieldOriginY + m_fieldHeight+m_radius;
+			m_speedY = 0;
+		}
+
+		if (m_posX <= m_fieldOriginX-m_radius*2) {
+			m_posX = m_fieldOriginX-m_radius*2;
+			m_speedX = 0;
+
+		} else if ((m_posX) > (m_fieldOriginX + m_fieldWidth+m_radius)) {
+			m_posX = m_fieldOriginX + m_fieldWidth+m_radius;
+			m_speedX = 0;
+		}
+	}
+
+	private void placeNextToPlayer(Player p) {
+		updateShape();
+		double angle = Math.atan2(getCenterX() - p.getCenterX(), getCenterY() - p.getCenterY());
+		m_posX = p.m_posX + (float)(Math.sin(angle) * (m_radius + p.m_radius));
+		m_posY = p.m_posY + (float)(Math.cos(angle) * (m_radius + p.m_radius));
+	}
+
+	public boolean isShooting() {
+		return shooting;
+	}
+
+	public void placer(int x, int y) {
+		m_posX = x;
+		m_posY = y;
+		m_speedX = 0;
+		m_speedY = 0;
+	}
+
+	public float getCenterX() {
+		return m_posX + m_radius;
+	}
+
+	public float getCenterY() {
+		return m_posY + m_radius;
+	}
+
+	public float getPosX() {
+		return m_posX;
+	}
+
+	public float getPosY() {
+		return m_posY;
+	}
+
+	public int getTeam() { return team; }
+
+	public void resetPos() {
+		m_posX = spawnX;
+		m_posY = spawnY;
+	}
+
+	public float getSpeedX() {
+		return m_speedX;
+	}
+
+	public float getSpeedY() {
+		return m_speedY;
+	}
+
+	public void setSpeed(float speed) {
+		m_speed = speed;
+	}
+
+	public float getRadius() {
+		return m_radius;
+	}
+
+	public void setColor(Color color) {
+		m_actualColor = color;
+	}
+
+	public void resetColor() {
+		m_actualColor = m_defaultColor;
+	}
+
+	public Circle getShape() {
+		return m_shape;
+	}
+
+
+
+//	public void setShape(Circle shape) {
+//		m_shape = shape;
+//	}
+
+//	public void setEnemy(Player enemy) {
+//		m_enemy = enemy;
+//	}
+
+	public float getSpawnX() {
+		return spawnX;
+	}
+
+	public void setSpawnX(float spawnX) {
+		this.spawnX = spawnX;
+	}
+
+	public float getSpawnY() {
+		return spawnY;
+	}
+
+	public void setSpawnY(float spawnY) {
+		this.spawnY = spawnY;
+	}
+
+}
