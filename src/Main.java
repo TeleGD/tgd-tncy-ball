@@ -3,7 +3,7 @@ import app.AppGame;
 public final class Main {
 
 	public static final void main(String[] arguments) {
-		String title = "TGD Arcade Input";
+		String title = "TNCY Ball";
 		int height = 960;
 		boolean fullscreen = false;
 		new AppGame(title, height, fullscreen) {

@@ -1,15 +1,13 @@
 package games.haxBall.bonus;
 
+import app.AppLoader;
+import games.haxBall.Ball;
+import games.haxBall.Field;
+import games.haxBall.Player;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.state.StateBasedGame;
-
-import app.AppLoader;
-
-import games.haxBall.Ball;
-import games.haxBall.Field;
-import games.haxBall.Player;
 
 public class Inflate extends Bonus {
 	private Ball ball;
@@ -32,7 +30,7 @@ public class Inflate extends Bonus {
 		}
 
 		if (timer <= 0) {
-			ball.setRad(ball.getRad()/sizeFactor);
+			ball.setRadius(ball.getRadius()/sizeFactor);
 			deleted = true;
 		}
 		super.update(container, game, delta);
@@ -42,6 +40,6 @@ public class Inflate extends Bonus {
 		activated = true;
 		sound.playAsSoundEffect(1, .4f, false);
 
-		ball.setRad(ball.getRad()*sizeFactor);
+		ball.setRadius(ball.getRadius()*sizeFactor);
 	}
 }

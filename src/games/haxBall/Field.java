@@ -1,22 +1,13 @@
 package games.haxBall;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import app.AppLoader;
+import games.haxBall.bonus.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.state.StateBasedGame;
 
-import games.haxBall.bonus.Bonus;
-import games.haxBall.bonus.Bip;
-import games.haxBall.bonus.Deflate;
-import games.haxBall.bonus.Flash;
-import games.haxBall.bonus.Inflate;
-import games.haxBall.bonus.Pillars;
-import games.haxBall.bonus.Teleport;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Field {
 	private int height;
@@ -27,23 +18,19 @@ public class Field {
 	private Color actualColor;
 	private List<Player> players;
 	private Ball ball;
-	private int world_height;
-	private int world_width;
 	private int bonusTimer;
 	private float rnd;
 	//private Image tn_logo;
 
 	private List<Bonus> bonus;
-	public Field(int world_height , int world_width){
+	public Field(World world){
 		// normalement ca marche (pas)...
-		this.height = (int)(0.8 * world_height);
-		this.width = (int)(0.7 * world_width);
-		this.pos_x = (int)(0.15 * world_width);
-		this.pos_y = (int)(0.1 * world_height);
+		this.height = (int)(0.7 * world.getHeight());
+		this.width = (int)(0.7 * world.getWidth());
+		this.pos_x = (int)(0.15 * world.getWidth());
+		this.pos_y = (int)(0.15 * world.getHeight());
 		this.defaultColor = new Color(102, 148, 68);
 		this.actualColor = defaultColor;
-		this.world_width = world_width;
-		this.world_height = world_height;
 		this.bonusTimer = 10*1000;
 		//this.tn_logo = AppLoader.loadPicture("/images/haxBall/tn.png");
 
@@ -58,7 +45,7 @@ public class Field {
 		players.add(new Player("J2",this,1));
 
 
-		ball = new Ball(this.height,this.width,this.pos_x,this.pos_y,this);
+		ball = new Ball(this, world);
 	}
 
 	public void setColor(Color c) {
@@ -91,7 +78,7 @@ public class Field {
 	}
 
 	public int getCenterY() {
-		return getPosX() + getHeight() / 2;
+		return getPosY() + getHeight() / 2;
 	}
 
 	public List<Player> getPlayers() {
@@ -138,7 +125,7 @@ public class Field {
 	}
 
 	private void generateBonus() {
-		int k= (int)(Math.random()*6);
+		int k= (int)(Math.random()*4);
 		int posX = (int)(Math.random()*5*width/6+pos_x+width/12);
 		int posY = (int)(Math.random()*5*height/6+pos_y+height/12);
 
@@ -147,19 +134,13 @@ public class Field {
 			bonus.add(new Deflate(posX, posY, this));
 			break;
 		case 1:
-			bonus.add(new Flash(posX, posY, this));
+			bonus.add(new Pillars(posX, posY, this));
 			break;
 		case 2:
 			bonus.add(new Inflate(posX, posY, this, ball));
 			break;
 		case 3:
 			bonus.add(new Teleport(posX, posY, this, ball));
-			break;
-		case 4:
-			bonus.add(new Bip(posX, posY, this));
-			break;
-		case 5:
-			bonus.add(new Pillars(posX, posY, this));
 			break;
 		default:
 			break;
@@ -169,10 +150,6 @@ public class Field {
 
 	public void render (GameContainer container, StateBasedGame game, Graphics context) {
 		/* Méthode exécutée environ 60 fois par seconde on espère !  */
-
-		//le tour du terrain
-		context.setColor(new Color(102, 111, 69));
-		context.fillRect(0, 0, this.world_width, this.world_height);
 		//le fond du terrain
 		context.setColor(actualColor);
 		context.fillRect(this.pos_x,this.pos_y,this.width,this.height);

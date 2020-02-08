@@ -1,18 +1,16 @@
 package games.haxBall.bonus;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import app.AppLoader;
+import games.haxBall.Ball;
+import games.haxBall.Field;
+import games.haxBall.Player;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.state.StateBasedGame;
 
-import app.AppLoader;
-
-import games.haxBall.Ball;
-import games.haxBall.Field;
-import games.haxBall.Player;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pillars extends Bonus {
 

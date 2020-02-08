@@ -1,62 +1,38 @@
 package games.haxBall;
 
-import app.AppGame;
-import app.AppInput;
-import app.AppState;
+import app.*;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Font;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.openal.Audio;
-import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 
-import app.AppLoader;
-
-public class World extends AppState {
-
-	private int ID;
-	private int state;
+public class World extends AppWorld {
 
 	private Field field;
+
 	private int width;
 	private int height;
-	private ScoreInterface interfaceScore;
+
+	private Font font;
+	private int scorePlayer1;
+	private int scorePlayer2;
 
 	private Audio soundMusicBackground;
 	private float soundMusicBackgroundPos;
 
 	public World(int ID) {
 		super(ID);
-		this.ID = ID;
-		this.state = 0;
 	}
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game) {
 		/* Méthode exécutée une unique fois au chargement du programme */
 		soundMusicBackground = AppLoader.loadAudio("/musics/haxBall/crowd.ogg");
-	}
-
-	@Override
-	public void enter(GameContainer container, StateBasedGame game) {
-		/* Méthode exécutée à l'apparition de la page */
-		if (this.state == 0) {
-			this.play(container, game);
-		} else if (this.state == 2) {
-			this.resume(container, game);
-		}
-	}
-
-	@Override
-	public void leave(GameContainer container, StateBasedGame game) {
-		/* Méthode exécutée à la disparition de la page */
-		if (this.state == 1) {
-			this.pause(container, game);
-		} else if (this.state == 3) {
-			this.stop(container, game);
-			this.state = 0; // TODO: remove
-		}
+		font = AppLoader.loadFont("/fonts/vt323.ttf", AppFont.BOLD, 60);
 	}
 
 	@Override
@@ -68,7 +44,7 @@ public class World extends AppState {
 			game.enterState(2, new FadeOutTransition(), new FadeInTransition());
 		}
 		field.update(container, game, delta);
-		if (interfaceScore.isWin()) {
+		if (scorePlayer1 == 10 || scorePlayer2 == 10) {
 			this.setState(3);
 			game.enterState(3, new FadeOutTransition(), new FadeInTransition());
 		}
@@ -77,8 +53,19 @@ public class World extends AppState {
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics context) {
 		/* Méthode exécutée environ 60 fois par seconde */
+
+		//le tour du terrain
+		context.setColor(new Color(102, 111, 69));
+		context.fillRect(0, 0, getWidth(), getHeight());
+
 		field.render(container, game, context);
-		interfaceScore.render(container, game, context);
+
+		//scores
+		context.setFont(this.font);
+		context.setColor(Color.white);
+		context.drawString(Integer.toString(scorePlayer1), field.getCenterX() - 35, 10);
+		context.drawString("-", field.getCenterX() - 10, 10);
+		context.drawString(Integer.toString(scorePlayer2), field.getCenterX() + 15, 10);
 	}
 
 	public void play (GameContainer container, StateBasedGame game) {
@@ -86,8 +73,8 @@ public class World extends AppState {
 		soundMusicBackground.playAsMusic(1, 2f, true);
 		this.width = container.getWidth ();
 		this.height = container.getHeight ();
-		field = new Field(this.height , this.width);
-		interfaceScore = new ScoreInterface(field.getBall());
+		field = new Field(this);
+		resetScore();
 	}
 
 	public void pause(GameContainer container, StateBasedGame game) {
@@ -105,14 +92,27 @@ public class World extends AppState {
 	public void stop(GameContainer container, StateBasedGame game) {
 		/* Méthode exécutée une unique fois à la fin du jeu */
 		soundMusicBackground.stop();
+		resetScore();
 	}
 
-	public void setState (int state) {
-		this.state = state;
+	public void addScore(int team) {
+		if(team == 0)
+			scorePlayer1++;
+		else
+			scorePlayer2++;
 	}
 
-	public int getState () {
-		return this.state;
+	public void resetScore() {
+		scorePlayer1 = 0;
+		scorePlayer2 = 0;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 
 }

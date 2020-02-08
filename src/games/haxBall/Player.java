@@ -8,7 +8,7 @@ import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.state.StateBasedGame;
 
 public class Player {
-	private float m_posX, m_posY, m_radius, m_fieldHeight, m_fieldWidth, m_fieldOriginX, m_fieldOriginY;
+	private float m_posX, m_posY, m_radius;
 	private Color m_actualColor, m_defaultColor;
 	private float m_speedX, m_speedY, m_speed;
 	private Field field;
@@ -28,18 +28,13 @@ public class Player {
 		this.shooting = false;
 		this.team = team;
 
-		m_fieldHeight = field.getHeight();
-		m_fieldWidth = field.getWidth();
-		m_fieldOriginX = field.getPosX();
-		m_fieldOriginY = field.getPosY();
-
-		m_radius = m_fieldHeight/25;
-		spawnY = (m_fieldHeight/2) + m_fieldOriginY - (m_radius/2);
+		m_radius = field.getHeight()/25;
+		spawnY = field.getCenterY() - m_radius;
 		m_speed = .3f;
 
 		if(team == 0) {
 
-			spawnX = ((m_fieldWidth)/6) + m_fieldOriginX;
+			spawnX = field.getCenterX() - (field.getWidth()*0.35f) - m_radius*2;
 
 			m_defaultColor = new Color(0, 0, 255);
 
@@ -50,7 +45,7 @@ public class Player {
 			this.club_logo = AppLoader.loadPicture("/images/icon.png");
 		}
 		else {
-			spawnX = ((3*m_fieldWidth)/4) + m_fieldOriginX;
+			spawnX = field.getCenterX() + (field.getWidth()*0.35f);
 			m_defaultColor = new Color(255, 0, 0);
 
 			shootButton = AppInput.BUTTON_A;
@@ -66,21 +61,17 @@ public class Player {
 		m_shape = new Circle(m_posX+(m_radius/2), m_posY+(m_radius/2), m_radius/2);
 	}
 
+	//Pilliers //TODO: faire que les pilliers ne soient pas des joueurs lol
 	public Player(int x, int y, Field field) {
 		this.field = field;
 		name = "";
-
-		m_fieldHeight = field.getHeight();
-		m_fieldWidth = field.getWidth();
-		m_fieldOriginX = field.getPosX();
-		m_fieldOriginY = field.getPosY();
 
 		this.shooting = false;
 		this.spawnX = x;
 		this.spawnY = y;
 		this.m_posX = spawnX;
 		this.m_posY = spawnY;
-		this.m_radius = m_fieldHeight/18;
+		this.m_radius = field.getHeight()/18;
 		this.m_defaultColor = new Color(70,70,70);
 		this.m_actualColor = m_defaultColor;
 		this.m_speed = 0;
@@ -88,12 +79,11 @@ public class Player {
 		this.m_shape = new Circle(m_posX+m_radius, m_posY+m_radius, m_radius);
 	}
 
-	/*public Player(int fieldHeight, int fieldWidth, int fieldOriginX, int fieldOriginY, int id, Player enemy) {
-		new Player(fieldHeight, fieldWidth, fieldOriginX, fieldOriginY, id);
-		m_enemy = enemy;
-	}*/
-
 	public void render (GameContainer container, StateBasedGame game, Graphics context) {
+		//ombre
+		context.setColor(new Color(0, 0, 0, 100));
+		context.fillOval(m_posX+3,m_posY+2,m_radius*2,m_radius*2);
+
 		context.setColor(m_actualColor);
 		context.fillOval(m_posX, m_posY, m_radius * 2, m_radius * 2);
 		if(team < 2) {
@@ -102,9 +92,6 @@ public class Player {
 			context.drawImage(club_logo, m_posX + 4, m_posY + 4, m_posX + m_radius * 2 - 4, m_posY + m_radius * 2 - 4, 0, 0, club_logo.getWidth(), club_logo.getHeight());
 			context.setColor(Color.black);
 		}
-
-//		context.setColor(new Color(0,255,0));
-//		context.draw(m_shape);
 	}
 
 	public void update (GameContainer container, StateBasedGame game, int delta) {
@@ -147,21 +134,21 @@ public class Player {
 			}
 		}
 
-		if(m_posY <= m_fieldOriginY-m_radius*2) {
-			m_posY = m_fieldOriginY-m_radius*2;
+		if(m_posY <= field.getPosY()-m_radius*3) {
+			m_posY = field.getPosY()-m_radius*3;
 			m_speedY = 0;
 
-		} else if((m_posY) > (m_fieldOriginY + m_fieldHeight+m_radius)) {
-			m_posY = m_fieldOriginY + m_fieldHeight+m_radius;
+		} else if((m_posY) > (field.getPosY() + field.getHeight()+m_radius*2)) {
+			m_posY = field.getPosY() + field.getHeight()+m_radius*2;
 			m_speedY = 0;
 		}
 
-		if (m_posX <= m_fieldOriginX-m_radius*2) {
-			m_posX = m_fieldOriginX-m_radius*2;
+		if (m_posX <= field.getPosX()-m_radius*3) {
+			m_posX = field.getPosX()-m_radius*3;
 			m_speedX = 0;
 
-		} else if ((m_posX) > (m_fieldOriginX + m_fieldWidth+m_radius)) {
-			m_posX = m_fieldOriginX + m_fieldWidth+m_radius;
+		} else if ((m_posX) > (field.getPosX() + field.getWidth()+m_radius*2)) {
+			m_posX = field.getPosX() + field.getWidth()+m_radius*2;
 			m_speedX = 0;
 		}
 	}
@@ -169,8 +156,8 @@ public class Player {
 	private void placeNextToPlayer(Player p) {
 		updateShape();
 		double angle = Math.atan2(getCenterX() - p.getCenterX(), getCenterY() - p.getCenterY());
-		m_posX = p.m_posX + (float)(Math.sin(angle) * (m_radius + p.m_radius));
-		m_posY = p.m_posY + (float)(Math.cos(angle) * (m_radius + p.m_radius));
+		m_posX = p.getCenterX() + (float)(Math.sin(angle) * (m_radius + p.m_radius)) - m_radius;
+		m_posY = p.getCenterY() + (float)(Math.cos(angle) * (m_radius + p.m_radius)) - m_radius;
 	}
 
 	public boolean isShooting() {
