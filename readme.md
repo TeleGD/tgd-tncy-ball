@@ -1,5 +1,3 @@
-# *Hax Ball*
+# *TNCY Ball*
 
-*Coding Night* du 20/10/2018
-
-![](screenshot.png)
+Projet hiver 2020 : version arcade du jeu *Hax Ball*

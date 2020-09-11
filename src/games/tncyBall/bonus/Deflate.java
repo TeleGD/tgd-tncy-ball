@@ -1,27 +1,25 @@
-package games.haxBall.bonus;
+package games.tncyBall.bonus;
 
 import app.AppLoader;
-import games.haxBall.Ball;
-import games.haxBall.Field;
-import games.haxBall.Player;
+import games.tncyBall.Ball;
+import games.tncyBall.Field;
+import games.tncyBall.Player;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.state.StateBasedGame;
 
-public class Inflate extends Bonus {
+public class Deflate extends Bonus {
 	private Ball ball;
-	private int timer;
 	private Audio sound;
-	private int sizeFactor = 4;
+	private int timer;
 
-	public Inflate(int posX, int posY, Field field, Ball ball) {
-		super(posX, posY, new Color(255,0,255), field);
+	public Deflate(int posX, int posY, Field field) {
+		super(posX, posY, new Color(255,128,0), field);
 
-		this.ball = ball;
+		ball = null;
 		timer = 12*1000;
-
-		this.sound = AppLoader.loadAudio("/sounds/haxBall/inflate.ogg");
+		this.sound = AppLoader.loadAudio("/sounds/tncyBall/deflate.ogg");
 	}
 
 	public void update(GameContainer container, StateBasedGame game, int delta) {
@@ -30,7 +28,7 @@ public class Inflate extends Bonus {
 		}
 
 		if (timer <= 0) {
-			ball.setRadius(ball.getRadius()/sizeFactor);
+			ball.setRadius(ball.getRadius()*2);
 			deleted = true;
 		}
 		super.update(container, game, delta);
@@ -39,7 +37,8 @@ public class Inflate extends Bonus {
 	public void activate(Player p, Ball b) {
 		activated = true;
 		sound.playAsSoundEffect(1, .4f, false);
-
-		ball.setRadius(ball.getRadius()*sizeFactor);
+		ball = b;
+		ball.setRadius(ball.getRadius()/2);
 	}
+
 }

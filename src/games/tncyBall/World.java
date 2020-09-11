@@ -1,4 +1,4 @@
-package games.haxBall;
+package games.tncyBall;
 
 import app.*;
 import org.newdawn.slick.Color;
@@ -31,7 +31,7 @@ public class World extends AppWorld {
 	@Override
 	public void init(GameContainer container, StateBasedGame game) {
 		/* Méthode exécutée une unique fois au chargement du programme */
-		soundMusicBackground = AppLoader.loadAudio("/musics/haxBall/crowd.ogg");
+		soundMusicBackground = AppLoader.loadAudio("/musics/tncyBall/crowd.ogg");
 		font = AppLoader.loadFont("/fonts/vt323.ttf", AppFont.BOLD, 60);
 	}
 

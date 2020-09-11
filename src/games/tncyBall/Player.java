@@ -1,4 +1,4 @@
-package games.haxBall;
+package games.tncyBall;
 
 import app.AppGame;
 import app.AppInput;
@@ -52,7 +52,7 @@ public class Player {
 			xAxis = AppInput.AXIS_XR;
 			yAxis = AppInput.AXIS_YR;
 
-			this.club_logo = AppLoader.loadPicture("/images/haxBall/tektn.png");
+			this.club_logo = AppLoader.loadPicture("/images/tncyBall/tektn.png");
 		}
 
 		m_posX = spawnX;

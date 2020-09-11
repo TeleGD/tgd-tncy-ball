@@ -1,8 +1,8 @@
-package games.haxBall.bonus;
+package games.tncyBall.bonus;
 
-import games.haxBall.Ball;
-import games.haxBall.Field;
-import games.haxBall.Player;
+import games.tncyBall.Ball;
+import games.tncyBall.Field;
+import games.tncyBall.Player;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;

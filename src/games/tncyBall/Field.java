@@ -1,6 +1,6 @@
-package games.haxBall;
+package games.tncyBall;
 
-import games.haxBall.bonus.*;
+import games.tncyBall.bonus.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -32,7 +32,7 @@ public class Field {
 		this.defaultColor = new Color(102, 148, 68);
 		this.actualColor = defaultColor;
 		this.bonusTimer = 10*1000;
-		//this.tn_logo = AppLoader.loadPicture("/images/haxBall/tn.png");
+		//this.tn_logo = AppLoader.loadPicture("/images/tncyBall/tn.png");
 
 		this.rnd = (float) Math.random();
 		//System.out.println(this.rnd);

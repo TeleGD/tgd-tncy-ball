@@ -12,7 +12,7 @@ public final class Main {
 				this.addState(new pages.Welcome(AppGame.PAGES_WELCOME));
 				this.addState(new pages.Menu(AppGame.PAGES_MENU));
 				this.addState(new pages.Pause(AppGame.PAGES_PAUSE));
-				this.addState(new games.haxBall.World(AppGame.PAGES_GAME));
+				this.addState(new games.tncyBall.World(AppGame.PAGES_GAME));
 			}
 
 		};

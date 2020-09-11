@@ -1,9 +1,9 @@
-package games.haxBall.bonus;
+package games.tncyBall.bonus;
 
 import app.AppLoader;
-import games.haxBall.Ball;
-import games.haxBall.Field;
-import games.haxBall.Player;
+import games.tncyBall.Ball;
+import games.tncyBall.Field;
+import games.tncyBall.Player;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.openal.Audio;
@@ -17,7 +17,7 @@ public class Teleport extends Bonus {
 		super(posX, posY, new Color(0,255,255), field);
 
 		this.ball = ball;
-		this.sound = AppLoader.loadAudio("/sounds/haxBall/teleportation.ogg");
+		this.sound = AppLoader.loadAudio("/sounds/tncyBall/teleportation.ogg");
 	}
 
 	public void update(GameContainer container, StateBasedGame game, int delta) {
